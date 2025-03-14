@@ -37,10 +37,10 @@ func (p *Philosopher) Eat(wg *sync.WaitGroup) {
 
 		<-p.host
 	}
+	fmt.Printf("Philosopher %d finishing eating with count %d\n", p.id, p.milsCount)
 }
 
-func main() {
-
+func initPhilosophers() []*Philosopher {
 	chopSticks := make([]*ChopSticks, numPhilosophers)
 
 	for i := 0; i < numPhilosophers; i++ {
@@ -58,6 +58,11 @@ func main() {
 			milsCount:  numMeals,
 		}
 	}
+	return philosophers
+}
+
+func main() {
+	philosophers := initPhilosophers()
 
 	var wg sync.WaitGroup
 	wg.Add(numPhilosophers)
