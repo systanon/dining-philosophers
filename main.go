@@ -7,7 +7,6 @@ import (
 )
 
 const numPhilosophers = 5
-const numMeals = 3
 
 type ChopSticks struct {
 	sync.Mutex
@@ -21,8 +20,7 @@ type Philosopher struct {
 	milsCount  int
 }
 
-func (p *Philosopher) Eat(wg *sync.WaitGroup) {
-	defer wg.Done()
+func (p *Philosopher) Eat() {
 	for i := 0; i < p.milsCount; i++ {
 		p.host <- struct{}{}
 
@@ -55,7 +53,7 @@ func initPhilosophers() []*Philosopher {
 			leftStick:  chopSticks[i],
 			rightStick: chopSticks[(i+1)%numPhilosophers],
 			host:       host,
-			milsCount:  numMeals,
+			milsCount:  3,
 		}
 	}
 	return philosophers
@@ -65,10 +63,13 @@ func main() {
 	philosophers := initPhilosophers()
 
 	var wg sync.WaitGroup
-	wg.Add(numPhilosophers)
+	wg.Add(len(philosophers))
 
 	for _, p := range philosophers {
-		go p.Eat(&wg)
+		go func() {
+			defer wg.Done()
+			p.Eat()
+		}()
 	}
 	wg.Wait()
 }
